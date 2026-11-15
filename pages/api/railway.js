@@ -10,11 +10,7 @@ export const config = {
 const RAILWAY_API = 'https://backboard.railway.com/graphql/v2';
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  // Same-origin API only. Do not enable wildcard CORS for a token-bearing proxy.
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -22,8 +18,9 @@ export default async function handler(req, res) {
   try {
     const { query, variables, tokens, testOnly } = req.body;
 
-    if (!query) return res.status(400).json({ error: 'Query is required' });
-    if (!tokens || !Array.isArray(tokens) || tokens.length === 0) {
+    if (typeof query !== 'string' || !query.trim()) return res.status(400).json({ error: 'Query is required' });
+    if (query.length > 100000) return res.status(413).json({ error: 'Query is too large' });
+    if (!tokens || !Array.isArray(tokens) || tokens.length === 0 || tokens.length > 10) {
       return res.status(400).json({ error: 'Kam se kam ek token chahiye' });
     }
 
@@ -84,12 +81,7 @@ export default async function handler(req, res) {
 
         const responseText = await response.text();
 
-        debug.push({
-          step: 'railway_response',
-          account: label,
-          httpStatus: response.status,
-          bodyPreview: responseText.substring(0, 300),
-        });
+        debug.push({ step: 'railway_response', account: label, httpStatus: response.status });
 
         let data;
         try {
@@ -161,7 +153,7 @@ export default async function handler(req, res) {
       error: 'Saare tokens fail ho gaye',
       details: errors,
       debug,
-      hint: 'Hoppscotch (https://hoppscotch.io) me token test karo. URL: https://backboard.railway.app/graphql/v2, Header: Authorization: Bearer TOKEN, Body: {"query":"query { me { email } }"}',
+      hint: 'Check token scope, permissions, and the Railway GraphQL API status. The response does not include token contents.',
     });
   } catch (err) {
     console.error('Proxy error:', err);
