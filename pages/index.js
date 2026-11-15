@@ -1091,7 +1091,7 @@ export default function Home() {
           <div className="brand">
             <span className="logo">🚂</span>
             <div>
-              <h1>Railway Panel</h1>
+              <h1>Railway Panel</h1><a href="/control" style={{fontSize:12,color:"#1769d2",fontWeight:700}}>Advanced Control →</a>
               <div className="status-line">
                 <span className={`dot dot-${status.type}`} />
                 <span className="status-text">{status.text}</span>
