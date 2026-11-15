@@ -1968,7 +1968,66 @@ export default function Home() {
           .sheet { border-radius: 24px; padding: 20px 30px 30px; }
           .repo-list { display: grid; grid-template-columns: repeat(2, 1fr); }
         }
-      `}</style>
+      `}
+        /* Premium blue & white responsive dashboard */
+        .app{background:linear-gradient(180deg,#f7faff 0%,#edf4ff 100%)!important;color:#10284b!important}
+        .header{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #dbe7f6!important;box-shadow:0 5px 22px rgba(26,75,130,.06)}
+        .header h1{background:linear-gradient(90deg,#1258b5,#2786ed)!important;-webkit-background-clip:text!important;background-clip:text!important}
+        .logo{filter:none!important}
+        .settings-btn,.icon-btn{background:#edf4ff!important;color:#175eae!important;border:1px solid #d8e6f8!important}
+        .status-text,.lbl,.hint,.proj-meta,.deploy-desc,.token-meta,.empty p{color:#647d9e!important}
+        .main{max-width:1100px;margin:0 auto;padding:18px 16px 30px}
+        .stat,.proj-card,.token-item,.deploy-card,.sheet,.github-user-bar,.usage-card,.var-item,.empty,.deploy-section{background:#fff!important;color:#153456!important;border:1px solid #dce8f7!important;box-shadow:0 8px 26px rgba(27,75,130,.07)}
+        .stat:before,.proj-card:before{background:linear-gradient(180deg,#1769d2,#58a5f5)!important}
+        .num,.usage-value{background:none!important;-webkit-text-fill-color:#1769d2!important;color:#1769d2!important}
+        .lbl{text-transform:uppercase;letter-spacing:.7px}
+        .btn-primary,.settings-btn{background:linear-gradient(135deg,#1769d2,#2787ed)!important;color:#fff!important;box-shadow:0 5px 15px rgba(23,105,210,.18)!important}
+        .btn-outline{background:#fff!important;color:#1769d2!important;border:1px solid #1769d2!important}
+        .btn-info{background:#e8f3ff!important;color:#155eae!important;box-shadow:none!important}
+        .btn-success{background:#e8f8ef!important;color:#167647!important;box-shadow:none!important}
+        .btn-warning{background:#fff5df!important;color:#94600b!important;box-shadow:none!important}
+        .btn-danger{background:#fff0f1!important;color:#bd3042!important;border:1px solid #f4cbd0!important}
+        .info{background:#edf6ff!important;border:1px solid #cfe3fb!important;color:#285b91!important}
+        .deploy-title,.proj-name,.token-name,.empty h3,.deploy-name{color:#153456!important}
+        .deploy-section{background:linear-gradient(135deg,#fff,#f4f8ff)!important}
+        .deploy-icon{filter:none}
+        .search,.sheet input,.sheet select,.sheet textarea,.var-add input,.token-value{background:#f7faff!important;border:1px solid #d4e2f3!important;color:#183653!important}
+        .search::placeholder,.sheet input::placeholder{color:#8ca1bb}
+        .search:focus,.sheet input:focus,.sheet select:focus,.sheet textarea:focus{border-color:#3987dc!important;box-shadow:0 0 0 3px rgba(23,105,210,.12)!important}
+        .proj-card:active,.deploy-card:active{border-color:#5a9be2!important}
+        .proj-name{word-break:break-word}
+        .proj-meta{line-height:1.8}
+        .svc{background:#f5f9ff!important;border:1px solid #e0eaf7!important}
+        .svc-name{color:#355779!important}
+        .chip{background:#edf3fa!important;color:#56718f!important}
+        .chip-green{background:#e8f8ef!important;color:#167647!important}
+        .chip-blue,.chip-purple{background:#e8f3ff!important;color:#1769d2!important}
+        .bottom-nav{background:rgba(255,255,255,.97)!important;border-top:1px solid #dbe7f6!important;box-shadow:0 -8px 25px rgba(26,75,130,.08)!important}
+        .nav-item{color:#7187a3!important}
+        .nav-item.active{color:#1769d2!important}
+        .nav-item.active:before{background:#1769d2!important}
+        .overlay{background:rgba(12,35,64,.42)!important}
+        .sheet{border-radius:24px 24px 0 0!important;box-shadow:0 -15px 50px rgba(20,55,95,.18)!important}
+        .sheet h2,.var-key{color:#1769d2!important}
+        .sheet label{color:#607b9d!important}
+        .sheet-handle{background:#c9d8e9!important}
+        .close-btn{background:#fff0f1!important;color:#bf3344!important}
+        .var-val{color:#47617f!important}
+        .var-val code{background:#edf4ff!important;color:#245b96!important}
+        .deploy-step{background:#f6f9fe!important;border:1px solid #dce8f7!important}
+        .deploy-step-text{color:#274563!important}
+        .deploy-step-detail{color:#7187a3!important}
+        .editor-tab{background:#f3f7fd!important;color:#4e6989!important;border-color:#dce8f7!important}
+        .editor-tab.active{background:#e8f3ff!important;color:#1769d2!important;border-color:#8bb9ec!important}
+        .github-user-bar{background:#fff!important}
+        .empty{border:1px dashed #b9cde5!important}
+        .dot{box-shadow:0 0 0 4px rgba(34,197,94,.12)!important}
+        .dot-loading{box-shadow:0 0 0 4px rgba(245,158,11,.12)!important}
+        .dot-error{box-shadow:0 0 0 4px rgba(239,68,68,.12)!important}
+        button:focus-visible{outline:3px solid rgba(23,105,210,.25);outline-offset:2px}
+        @media(min-width:760px){.stats-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.main{padding:24px 22px 36px}.list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.header{padding:16px max(20px,calc((100vw - 1060px)/2))}}
+        @media(max-width:420px){.main{padding:12px 11px 24px}.stats-grid{gap:8px}.stat{padding:12px}.num{font-size:23px}.btn{padding:11px 12px}.deploy-btns{grid-template-columns:repeat(2,minmax(0,1fr))}.sheet{padding-left:16px;padding-right:16px}}
+</style>
     </>
   );
 }
