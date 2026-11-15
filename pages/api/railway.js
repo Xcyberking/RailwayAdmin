@@ -7,7 +7,7 @@ export const config = {
   },
 };
 
-const RAILWAY_API = 'https://backboard.railway.app/graphql/v2';
+const RAILWAY_API = 'https://backboard.railway.com/graphql/v2';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       const tokenInfo = {
         account: label,
         length: token.length,
-        preview: token.substring(0, 12) + '...' + token.slice(-8),
+        preview: '[REDACTED]',
         hasSpaces: /\s/.test(token),
         hasNewlines: /[\r\n]/.test(token),
       };
