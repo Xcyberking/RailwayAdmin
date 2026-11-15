@@ -1968,7 +1968,6 @@ export default function Home() {
           .sheet { border-radius: 24px; padding: 20px 30px 30px; }
           .repo-list { display: grid; grid-template-columns: repeat(2, 1fr); }
         }
-      `}
         /* Premium blue & white responsive dashboard */
         .app{background:linear-gradient(180deg,#f7faff 0%,#edf4ff 100%)!important;color:#10284b!important}
         .header{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #dbe7f6!important;box-shadow:0 5px 22px rgba(26,75,130,.06)}
@@ -2027,7 +2026,7 @@ export default function Home() {
         button:focus-visible{outline:3px solid rgba(23,105,210,.25);outline-offset:2px}
         @media(min-width:760px){.stats-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.main{padding:24px 22px 36px}.list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.header{padding:16px max(20px,calc((100vw - 1060px)/2))}}
         @media(max-width:420px){.main{padding:12px 11px 24px}.stats-grid{gap:8px}.stat{padding:12px}.num{font-size:23px}.btn{padding:11px 12px}.deploy-btns{grid-template-columns:repeat(2,minmax(0,1fr))}.sheet{padding-left:16px;padding-right:16px}}
-</style>
+      `}</style>
     </>
   );
 }
