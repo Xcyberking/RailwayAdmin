@@ -1,29 +1,23 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-html, body { background:#05050a; color:#fff; min-height:100vh; overflow-x:hidden; overscroll-behavior-y:auto; scroll-behavior:smooth; }
-a { color:inherit; text-decoration:none; }
-button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
-input,select,textarea { font-family:inherit; -webkit-appearance:none; }
-::-webkit-scrollbar { width:6px; height:6px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:#2a2a4a; border-radius:3px; }
-::-webkit-scrollbar-thumb:hover { background:#a855f7; }
-.scroll-top { position:fixed; right:18px; bottom:calc(88px + env(safe-area-inset-bottom)); z-index:60; width:46px; height:46px; border:1px solid rgba(168,85,247,.65); border-radius:50%; background:linear-gradient(135deg,#a855f7,#6366f1); color:#fff; font-size:25px; font-weight:800; line-height:1; box-shadow:0 8px 24px rgba(0,0,0,.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .2s ease,opacity .2s ease; }
-.scroll-top:active { transform:scale(.92); }
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scroll-top{transition:none}}
-/* Blue and white theme overrides */
-html,body { background:#f4f8ff; color:#10284b; }
-::-webkit-scrollbar-thumb { background:#9bbce7; }
-::-webkit-scrollbar-thumb:hover { background:#1769d2; }
-.scroll-top { border-color:#1769d2; background:#1769d2; box-shadow:0 8px 24px #174b8330; }
-.bottom-nav { background:#fff!important; border-top:1px solid #dce8f8!important; box-shadow:0 -8px 24px #174b830d!important; }
-.nav-item { color:#6680a5!important; }
-.nav-item.active { color:#1769d2!important; }
-.btn-primary,.settings-btn { background:#1769d2!important; color:#fff!important; }
-.stat,.deploy-card,.token-item,.repo-card,.sheet,.modal { background:#fff!important; color:#10284b!important; border-color:#dce8f8!important; }
-.status-text,.lbl,.hint { color:#6680a5!important; }
+:root{color-scheme:light;--blue:#1769d2;--blue-dark:#1255ad;--blue-soft:#eaf3ff;--ink:#153456;--muted:#68809e;--line:#dce8f7;--surface:#fff;--page:#f4f8ff}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+html,body,#__next{min-height:100%;background:var(--page);color:var(--ink);overflow-x:hidden;overscroll-behavior-y:auto;scroll-behavior:smooth}
+body{background:linear-gradient(180deg,#f8fbff 0%,#eff5ff 100%);font-size:14px}
+a{color:var(--blue);text-decoration:none}
+button{font:inherit;cursor:pointer;border:0}
+button:disabled{cursor:not-allowed;opacity:.5}
+input,select,textarea{font:inherit;max-width:100%;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#6da7e8;box-shadow:0 0 0 3px rgba(23,105,210,.11)}
+::selection{background:#cfe4ff;color:#123d70}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#b5cce8;border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--blue)}
+.scroll-top{position:fixed;right:18px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:60;width:46px;height:46px;border:1px solid var(--blue);border-radius:50%;background:linear-gradient(135deg,#1769d2,#3288e8);color:#fff;font-size:25px;font-weight:800;line-height:1;box-shadow:0 8px 24px rgba(23,105,210,.25);display:flex;align-items:center;justify-content:center;transition:transform .2s ease,opacity .2s ease}
+.scroll-top:active{transform:scale(.92)}
+.bottom-nav{background:rgba(255,255,255,.97)!important;border-top:1px solid var(--line)!important;box-shadow:0 -8px 24px rgba(23,73,125,.08)!important;backdrop-filter:blur(16px)}
+.nav-item{color:#7187a3!important}
+.nav-item.active{color:var(--blue)!important}
+.btn-primary,.settings-btn{background:linear-gradient(135deg,#1769d2,#3288e8)!important;color:#fff!important}
+.stat,.deploy-card,.token-item,.repo-card,.sheet,.modal{background:#fff!important;color:var(--ink)!important;border-color:var(--line)!important}
+.status-text,.lbl,.hint{color:var(--muted)!important}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
