@@ -1,0 +1,62 @@
+import { useEffect, useMemo, useState } from 'react';
+import Head from 'next/head';
+
+const API='/api/railway';
+const Q={
+  projects:`query { projects { edges { node { id name services { edges { node { id name } } } environments { edges { node { id name } } } } } } }`,
+  deployments:`query($input: DeploymentListInput!, $first: Int) { deployments(input:$input, first:$first) { edges { node { id status createdAt url staticUrl meta canRedeploy canRollback } } } }`,
+  deploy:`mutation($serviceId:String!,$environmentId:String!){serviceInstanceDeployV2(serviceId:$serviceId,environmentId:$environmentId)}`,
+  redeploy:`mutation($id:String!){deploymentRedeploy(id:$id){id status}}`,
+  restart:`mutation($id:String!){deploymentRestart(id:$id)}`,
+  rollback:`mutation($id:String!){deploymentRollback(id:$id){id status}}`,
+  stop:`mutation($id:String!){deploymentStop(id:$id)}`,
+  cancel:`mutation($id:String!){deploymentCancel(id:$id)}`,
+  remove:`mutation($id:String!){deploymentRemove(id:$id)}`,
+  serviceCreate:`mutation($input:ServiceCreateInput!){serviceCreate(input:$input){id name}}`,
+  serviceUpdate:`mutation($id:String!,$input:ServiceUpdateInput!){serviceUpdate(id:$id,input:$input){id name}}`,
+  serviceDelete:`mutation($id:String!){serviceDelete(id:$id)}`,
+  serviceConnect:`mutation($id:String!,$input:ServiceConnectInput!){serviceConnect(id:$id,input:$input){id}}`,
+  serviceDisconnect:`mutation($id:String!){serviceDisconnect(id:$id){id}}`,
+  instanceUpdate:`mutation($serviceId:String!,$environmentId:String!,$input:ServiceInstanceUpdateInput!){serviceInstanceUpdate(serviceId:$serviceId,environmentId:$environmentId,input:$input)}`,
+  domainAvailable:`query($domain:String!){customDomainAvailable(domain:$domain){available message}}`,
+  domainCreate:`mutation($input:CustomDomainCreateInput!){customDomainCreate(input:$input){id domain status{verificationToken dnsRecords{hostlabel requiredValue status}}}}`,
+  volumeCreate:`mutation($input:VolumeCreateInput!){volumeCreate(input:$input){id name}}`,
+  volumeDelete:`mutation($volumeId:String!){volumeDelete(volumeId:$volumeId)}`,
+  volumeBackup:`mutation($volumeInstanceId:String!){volumeInstanceBackupCreate(volumeInstanceId:$volumeInstanceId)}`
+};
+export default function Control(){
+ const [tokens,setTokens]=useState([]),[projects,setProjects]=useState([]),[projectId,setProjectId]=useState(''),[serviceId,setServiceId]=useState(''),[environmentId,setEnvironmentId]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('Connect Railway token in the main dashboard first.'),[deployments,setDeployments]=useState([]),[deploymentId,setDeploymentId]=useState('');
+ const [form,setForm]=useState({name:'',repo:'',branch:'main',domain:'',mountPath:'/data',volumeId:'',volumeInstanceId:'',startCommand:'',buildCommand:''});
+ const selected=useMemo(()=>projects.find(p=>p.id===projectId),[projects,projectId]);
+ const services=selected?.services||[], environments=selected?.environments||[];
+ useEffect(()=>{try{const v=JSON.parse(localStorage.getItem('rw_tokens_v9')||'[]');setTokens(Array.isArray(v)?v:[])}catch{}},[]);
+ async function call(query,variables={}){
+  if(!tokens.length)throw new Error('Main dashboard me Railway API token add karke save karein.');
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,variables,tokens})});
+  const j=await r.json(); if(!r.ok||j.errors?.length||j.error)throw new Error(j.errors?.[0]?.message||j.error||j.details?.join(', ')||'Railway API error'); return j.data;
+ }
+ async function run(label,query,variables={},refresh=false){
+  setBusy(true);setMessage(label+'…');try{const d=await call(query,variables);setMessage(label+' successful.');if(refresh)await loadProjects();return d}catch(e){setMessage('Error: '+e.message);throw e}finally{setBusy(false)}
+ }
+ async function loadProjects(){try{const d=await call(Q.projects);const list=d.projects?.edges?.map(x=>x.node)||[];setProjects(list);if(!projectId&&list[0])setProjectId(list[0].id);setMessage('Loaded '+list.length+' Railway projects.')}catch(e){setMessage('Error: '+e.message)}}
+ async function loadDeployments(){if(!projectId||!serviceId||!environmentId)return setMessage('Select project, service and environment first.');try{setBusy(true);const d=await call(Q.deployments,{input:{projectId,serviceId,environmentId},first:20});setDeployments(d.deployments?.edges?.map(x=>x.node)||[]);setMessage('Deployment history loaded.')}catch(e){setMessage('Error: '+e.message)}finally{setBusy(false)}}
+ useEffect(()=>{if(tokens.length)loadProjects()},[tokens.length]);
+ const act=async (label,q,v)=>{try{await run(label,q,v);if(label.toLowerCase().includes('deploy'))await loadDeployments()}catch{}};
+ return <><Head><title>Railway Control Center</title><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/></Head>
+ <div className="control"><header><a href="/">← Main Dashboard</a><div><b>Railway Control Center</b><small>API-powered infrastructure management</small></div><button onClick={loadProjects} disabled={busy}>↻ Refresh</button></header>
+ <div className="notice">{message}</div>
+ <section className="card"><h2>Project & Service</h2><label>Project</label><select value={projectId} onChange={e=>setProjectId(e.target.value)}><option value="">Select project</option>{projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
+ <label>Service</label><select value={serviceId} onChange={e=>setServiceId(e.target.value)}><option value="">Select service</option>{services.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select>
+ <label>Environment</label><select value={environmentId} onChange={e=>setEnvironmentId(e.target.value)}><option value="">Select environment</option>{environments.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select>
+ <div className="actions"><button onClick={()=>act('Deploy',Q.deploy,{serviceId,environmentId})} disabled={busy||!serviceId||!environmentId}>Deploy</button><button onClick={loadDeployments} disabled={busy}>Deployment History</button></div></section>
+ <section className="card"><h2>Deployments</h2><label>Deployment</label><select value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select deployment</option>{deployments.map(d=><option key={d.id} value={d.id}>{d.status} · {d.id.slice(0,12)} · {new Date(d.createdAt).toLocaleString()}</option>)}</select><div className="actions">{[['Redeploy',Q.redeploy],['Restart',Q.restart],['Rollback',Q.rollback],['Stop',Q.stop],['Cancel',Q.cancel],['Remove',Q.remove]].map(([n,q])=><button key={n} className={['Stop','Cancel','Remove'].includes(n)?'danger':''} disabled={busy||!deploymentId} onClick={()=>{if(['Stop','Cancel','Remove','Rollback'].includes(n)&&!confirm(n+' this deployment?'))return;act(n,q,{id:deploymentId})}}>{n}</button>)}</div><p className="muted">Rollback is available only when Railway reports canRollback=true. Remove/stop actions can interrupt a running service.</p></section>
+ <section className="card"><h2>Service Management</h2><label>Service name</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="New service name"/><label>GitHub repo (owner/repo)</label><input value={form.repo} onChange={e=>setForm({...form,repo:e.target.value})} placeholder="owner/repository"/><label>Branch</label><input value={form.branch} onChange={e=>setForm({...form,branch:e.target.value})}/><div className="actions"><button disabled={busy||!projectId||!form.name} onClick={()=>act('Create service',Q.serviceCreate,{input:{projectId,name:form.name,source:form.repo?{repo:form.repo}:undefined}})}>Create service</button><button disabled={busy||!serviceId||!form.name} onClick={()=>act('Rename service',Q.serviceUpdate,{id:serviceId,input:{name:form.name}})}>Rename</button><button disabled={busy||!serviceId||!form.repo} onClick={()=>act('Connect GitHub',Q.serviceConnect,{id:serviceId,input:{repo:form.repo,branch:form.branch}})}>Connect GitHub</button><button disabled={busy||!serviceId} onClick={()=>act('Disconnect GitHub',Q.serviceDisconnect,{id:serviceId})}>Disconnect GitHub</button><button className="danger" disabled={busy||!serviceId} onClick={()=>{if(confirm('Delete this service and its deployments?'))act('Delete service',Q.serviceDelete,{id:serviceId},true)}}>Delete service</button></div>
+ <h3>Build & Start Settings</h3><label>Build command</label><input value={form.buildCommand} onChange={e=>setForm({...form,buildCommand:e.target.value})} placeholder="npm install && npm run build"/><label>Start command</label><input value={form.startCommand} onChange={e=>setForm({...form,startCommand:e.target.value})} placeholder="npm start"/><button disabled={busy||!serviceId||!environmentId} onClick={()=>act('Save service settings',Q.instanceUpdate,{serviceId,environmentId,input:{...(form.buildCommand?{buildCommand:form.buildCommand}:{}),...(form.startCommand?{startCommand:form.startCommand}:{})}})}>Save settings</button></section>
+ <section className="card"><h2>Domains</h2><label>Custom domain</label><input value={form.domain} onChange={e=>setForm({...form,domain:e.target.value})} placeholder="app.example.com"/><div className="actions"><button disabled={busy||!form.domain} onClick={()=>act('Check domain',Q.domainAvailable,{domain:form.domain})}>Check availability</button><button disabled={busy||!form.domain||!projectId||!serviceId||!environmentId} onClick={()=>act('Add custom domain',Q.domainCreate,{input:{projectId,serviceId,environmentId,domain:form.domain}})}>Add domain</button></div><p className="muted">DNS verification records returned by Railway are shown in the API response status message when available.</p></section>
+ <section className="card"><h2>Volumes</h2><label>Mount path</label><input value={form.mountPath} onChange={e=>setForm({...form,mountPath:e.target.value})}/><button disabled={busy||!projectId||!serviceId} onClick={()=>act('Create volume',Q.volumeCreate,{input:{projectId,serviceId,mountPath:form.mountPath}})}>Create volume</button><label>Volume ID</label><input value={form.volumeId} onChange={e=>setForm({...form,volumeId:e.target.value})}/><button className="danger" disabled={busy||!form.volumeId} onClick={()=>{if(confirm('Permanently delete volume and all its data?'))act('Delete volume',Q.volumeDelete,{volumeId:form.volumeId})}}>Delete volume</button><label>Volume instance ID for backup</label><input value={form.volumeInstanceId} onChange={e=>setForm({...form,volumeInstanceId:e.target.value})}/><button disabled={busy||!form.volumeInstanceId} onClick={()=>act('Create volume backup',Q.volumeBackup,{volumeInstanceId:form.volumeInstanceId})}>Create backup</button></section>
+ <footer>All operations run against Railway's official GraphQL API. API access and available fields depend on your token permissions and Railway's live schema.</footer>
+ </div>
+ <style jsx global>{`
+ *{box-sizing:border-box}body{margin:0;background:#f4f8ff;color:#10284b;font-family:Arial,sans-serif}.control{max-width:900px;margin:auto;padding:14px 14px 40px}header{position:sticky;top:0;z-index:5;background:#f4f8ffed;backdrop-filter:blur(12px);padding:12px 0;display:flex;align-items:center;gap:12px;border-bottom:1px solid #dce8f8}header div{flex:1}header b{display:block;font-size:18px}header small{color:#6680a5}a{color:#1769d2;text-decoration:none;font-weight:700}button{border:0;border-radius:11px;padding:12px 14px;background:#1769d2;color:white;font-weight:700;cursor:pointer}button:disabled{opacity:.45}.card{background:white;border:1px solid #dce8f8;border-radius:18px;padding:18px;margin:16px 0;box-shadow:0 8px 26px #174b8310}.card h2{margin:0 0 14px;color:#1557a6}.card h3{margin:18px 0 8px}.card label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px;color:#557092}input,select{width:100%;padding:12px;border:1px solid #cbdcf1;border-radius:10px;background:#fbfdff;color:#10284b;font-size:15px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1;min-width:110px}.danger{background:#d94354}.notice{margin:16px 0;padding:13px;border-radius:12px;background:#e4f0ff;color:#1557a6;overflow-wrap:anywhere}.muted,footer{font-size:12px;color:#6d83a2;line-height:1.5}footer{text-align:center;padding:20px 8px}@media(max-width:480px){.control{padding:10px 10px 32px}.card{padding:14px}header b{font-size:16px}.actions button{min-width:calc(50% - 8px)}}
+ `}</style></>;
+}
