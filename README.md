@@ -1,30 +1,48 @@
-# RailwayAdmin — Railway Hosting Control Panel
+# RailwayAdmin
 
-Mobile-first Railway dashboard powered by Railway's official GraphQL Public API.
+A mobile-first blue-and-white Railway hosting control panel built with Next.js and Railway's official GraphQL Public API.
 
-## Included
-- Multi-token connection support through the existing dashboard.
-- Project and service overview.
-- GitHub repository browsing and deployment workflows already present in the main dashboard.
-- Advanced Control Center at `/control`:
-  - Project, service and environment selection.
-  - Deployment history, deploy, redeploy, restart, rollback, stop, cancel and remove.
-  - Create, rename, connect/disconnect GitHub and delete services.
-  - Per-environment build/start command updates.
-  - Custom domain availability check and domain creation.
-  - Volume creation, backup creation and deletion (deletion is destructive).
-- Responsive blue-and-white mobile interface.
+## Dashboard capabilities
+
+- Multi-token account support in the existing dashboard.
+- Project and service overview, create project, create service, rename and remove service.
+- GitHub repository browser, GitHub deployment workflows, ZIP deployment and code editor (existing dashboard features).
+- Deploy, deployment history, redeploy, restart, rollback, stop, cancel and remove deployment.
+- Runtime logs, build logs and environment-wide logs.
+- Environment variables: list, create/update and delete.
+- Railway-provided domains and custom domains: list, generate, add, inspect DNS/certificate status and delete.
+- Environments: list, create, rename and delete.
+- Volumes: create, delete, list backups, create backups and restore backups.
+- GraphQL schema explorer and authenticated API query runner.
+- Mobile responsive navigation and blue-white styling.
 
 ## Setup
-1. Deploy this Next.js project.
-2. Open the dashboard and add a Railway API token.
-3. Save the token, then open **Advanced Control**.
-4. Select a project, service and environment before performing service/deployment actions.
 
-## Important
-- The API token is currently retained in this browser's local storage by the legacy dashboard. Use a private device and clear it with the dashboard's Disconnect/Delete token action when finished. For a multi-user production deployment, replace browser token storage with encrypted server-side sessions and per-user authentication.
-- Railway API permissions and schema availability depend on token scope and Railway's current API schema.
-- Volume deletion permanently deletes stored data. Confirm before using it.
-- CPU/RAM/usage metrics, complete log streaming, custom domain deletion, and full environment management are not represented as fake controls; add them only after wiring to the exact live API fields supported by the connected account.
+1. Deploy the Next.js application.
+2. Open the main dashboard and add a Railway API token.
+3. Open **Advanced Control** and select the project, service and environment.
+4. Use each section to load live data before taking actions.
 
-API endpoint: `https://backboard.railway.com/graphql/v2`.
+## Security notes
+
+- The legacy dashboard stores Railway tokens in this browser's localStorage. This is convenient for a personal, single-user panel but is not a secure multi-user credential vault. Do not use this on a shared device. A production multi-user version should use authenticated server-side sessions and encrypted secret storage.
+- The API proxy is same-origin only and does not return token previews or full Railway response bodies in debug logs.
+- Never share screenshots containing environment-variable values, tokens, or private deployment logs.
+- Destructive operations (deleting environments, services, volumes, domains, or deployments) should be used carefully. Volume deletion permanently removes data; environment deletion removes its deployments.
+
+## API limitations
+
+- Railway's public API is GraphQL and its schema can evolve. Every operation is validated by Railway at request time; permissions depend on the token scope.
+- CPU, memory, disk and network metrics are available in Railway's observability surfaces and CLI. The public GraphQL API docs do not currently provide a stable metrics query example, so the dashboard does not invent usage values. The Metrics / API page inspects the live GraphQL query schema and provides an API explorer.
+- Log and deployment data is live only when the selected token can access the selected project and environment.
+
+## Official documentation
+
+- Public API: https://docs.railway.com/integrations/api
+- GraphQL overview: https://docs.railway.com/integrations/api/graphql-overview
+- API cookbook: https://docs.railway.com/integrations/api/api-cookbook
+- Manage deployments: https://docs.railway.com/integrations/api/manage-deployments
+- Manage variables: https://docs.railway.com/integrations/api/manage-variables
+- Manage environments: https://docs.railway.com/integrations/api/manage-environments
+- Manage domains: https://docs.railway.com/integrations/api/manage-domains
+- Manage volumes: https://docs.railway.com/integrations/api/manage-volumes
